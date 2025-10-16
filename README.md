@@ -1,18 +1,11 @@
-# iloveyoukielie
-<!--
-I Love You Kiel Bunny Game
-Single-file HTML/JS/CSS game: control the bunny with arrow keys or touch to eat 3 sunflowers.
-When all are eaten a cute message appears with confetti.
 
-Feel free to ask for: different colors, bunny sprite, sound effects, or sharing a message.
--->
-
+[bunny_kiel_game.html](https://github.com/user-attachments/files/22949781/bunny_kiel_game.html)
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Bunny Snack Game</title>
+  <title>I Love You Kiel Bunny Game</title>
   <style>
     :root{--bg:#f7f8fc;--ground:#cde6a7;--bunny:#fff;--accent:#ffb703}
     html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
@@ -48,7 +41,7 @@ Feel free to ask for: different colors, bunny sprite, sound effects, or sharing 
     <div class="overlay" id="overlay" style="display:none">
       <div class="modal" id="modal">
         <h1>Yay! The bunny's full 🐰✨</h1>
-        <p id="cuteMsg">You did it — here's a smooch for your girlfriend! 💕</p>
+        <p id="cuteMsg">I love you, Kiel. You make my heart hop. 💖</p>
         <div style="display:flex;gap:8px;justify-content:center">
           <button class="btn" id="playAgain">Play again</button>
         </div>
@@ -63,8 +56,6 @@ Feel free to ask for: different colors, bunny sprite, sound effects, or sharing 
     let W = canvas.width, H = canvas.height;
 
     function resizeCanvas(){
-      // keep internal resolution fixed for simpler collision math;
-      // canvas styled to fit container, but internal size stays same
       const rect = canvas.getBoundingClientRect();
       canvas.style.width = rect.width + 'px';
       canvas.style.height = rect.height + 'px';
@@ -98,45 +89,32 @@ Feel free to ask for: different colors, bunny sprite, sound effects, or sharing 
     }
 
     function drawBunny(x,y,r){
-      // body
       ctx.save();
       ctx.translate(x,y);
-      // shadow
       ctx.beginPath(); ctx.ellipse(0+4, r+8, r*0.9, r*0.4, 0,0,Math.PI*2); ctx.fillStyle='rgba(30,30,30,0.06)'; ctx.fill();
 
-      // ears
       ctx.fillStyle = '#fff';
       ctx.beginPath(); ctx.ellipse(-12,-r-10,8,18, -0.2,0,Math.PI*2); ctx.fill();
       ctx.beginPath(); ctx.ellipse(12,-r-10,8,18, 0.2,0,Math.PI*2); ctx.fill();
-      // inner ear
       ctx.fillStyle='#ffd9e6'; ctx.beginPath(); ctx.ellipse(-12,-r-8,4,10,-0.2,0,Math.PI*2); ctx.fill();
       ctx.beginPath(); ctx.ellipse(12,-r-8,4,10,0.2,0,Math.PI*2); ctx.fill();
 
-      // head
       ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.fill();
-      // eyes
       ctx.fillStyle='#333'; ctx.beginPath(); ctx.arc(-8,-4,3,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(8,-4,3,0,Math.PI*2); ctx.fill();
-      // nose
       ctx.fillStyle='#ff7aa2'; ctx.beginPath(); ctx.arc(0,4,4,0,Math.PI*2); ctx.fill();
-      // smile
       ctx.beginPath(); ctx.arc(0,8,8,0,Math.PI); ctx.strokeStyle='#e3a0b6'; ctx.lineWidth=1.4; ctx.stroke();
 
-      // tiny cheeks
       ctx.fillStyle='#ffe0ea'; ctx.beginPath(); ctx.ellipse(-14,2,4,2,0,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.ellipse(14,2,4,2,0,0,Math.PI*2); ctx.fill();
       ctx.restore();
     }
 
     function drawFlower(f){
-      // sunflower: yellow petals + brown centre
       ctx.save(); ctx.translate(f.x,f.y);
-      // stem
       ctx.beginPath(); ctx.moveTo(0,10); ctx.lineTo(0,40); ctx.strokeStyle='#2a7a2a'; ctx.lineWidth=6; ctx.stroke();
-      // petals
       for(let i=0;i<12;i++){
         ctx.rotate(Math.PI*2/12);
         ctx.beginPath(); ctx.ellipse(0,-12,8,14,0,0,Math.PI*2); ctx.fillStyle='#ffd54a'; ctx.fill();
       }
-      // centre
       ctx.beginPath(); ctx.arc(0,0,9,0,Math.PI*2); ctx.fillStyle='#6b3b1b'; ctx.fill();
       ctx.restore();
     }
@@ -148,24 +126,20 @@ Feel free to ask for: different colors, bunny sprite, sound effects, or sharing 
       if(keys['ArrowRight']||keys['d']) vx += 1;
       if(keys['ArrowUp']||keys['w']) vy -= 1;
       if(keys['ArrowDown']||keys['s']) vy += 1;
-      // normalized
       if(vx!==0 || vy!==0){
         const len = Math.hypot(vx,vy); vx/=len; vy/=len;
         bunny.x += vx * bunny.speed * dt;
         bunny.y += vy * bunny.speed * dt;
       }
-      // bounds
       bunny.x = Math.max(bunny.r+8, Math.min(W-bunny.r-8, bunny.x));
       bunny.y = Math.max(bunny.r+8, Math.min(H-bunny.r-8, bunny.y));
 
-      // check collisions with flowers
       for(const f of flowers){
         if(f.eaten) continue;
         const dx = f.x - bunny.x; const dy = f.y - bunny.y; const dist = Math.hypot(dx,dy);
         if(dist < f.r + bunny.r*0.6){
           f.eaten = true; eaten++;
           document.getElementById('score').textContent = `Sunflowers: ${eaten} / ${totalFlowers}`;
-          // small pop animation: scale the flower temporarily
           spawnPop(f.x,f.y);
           if(eaten >= totalFlowers){
             finished = true; showModal();
@@ -174,7 +148,6 @@ Feel free to ask for: different colors, bunny sprite, sound effects, or sharing 
       }
     }
 
-    // little pop particles when bunny eats a flower
     const pops = [];
     function spawnPop(x,y){
       for(let i=0;i<14;i++){
@@ -184,22 +157,18 @@ Feel free to ask for: different colors, bunny sprite, sound effects, or sharing 
 
     function draw(dt){
       ctx.clearRect(0,0,W,H);
-      // ground
       ctx.fillStyle = '#f6fff0'; ctx.fillRect(0,H-72,W,72);
 
-      // draw flowers
       for(const f of flowers){ if(!f.eaten) drawFlower(f); }
 
-      // draw pops
       for(let i=pops.length-1;i>=0;i--){
         const p = pops[i]; p.life -= dt; if(p.life<=0) {pops.splice(i,1); continue}
         ctx.globalAlpha = Math.max(0, p.life/1.0);
         ctx.fillStyle = p.color; ctx.beginPath(); ctx.ellipse(p.x,p.y,4,6,0,0,Math.PI*2); ctx.fill();
-        p.x += p.vx*dt; p.y += p.vy*dt; p.vy += 300*dt; // gravity
+        p.x += p.vx*dt; p.y += p.vy*dt; p.vy += 300*dt;
         ctx.globalAlpha =1;
       }
 
-      // draw bunny
       drawBunny(bunny.x,bunny.y,bunny.r);
     }
 
@@ -209,27 +178,22 @@ Feel free to ask for: different colors, bunny sprite, sound effects, or sharing 
       requestAnimationFrame(loop);
     }
 
-    // input handlers
     window.addEventListener('keydown', e=>{keys[e.key]=true;});
     window.addEventListener('keyup', e=>{keys[e.key]=false;});
 
-    // pointer/touch to move the bunny toward pointer while pressed
     let pointerActive = false;
     canvas.addEventListener('pointerdown', e=>{pointerActive=true; moveToward(e);});
     window.addEventListener('pointerup', ()=>{pointerActive=false;});
     canvas.addEventListener('pointermove', e=>{ if(pointerActive) moveToward(e); });
 
     function moveToward(e){
-      // translate client coords to canvas internal coords
       const rect = canvas.getBoundingClientRect();
       const cx = (e.clientX - rect.left) * (W / rect.width);
       const cy = (e.clientY - rect.top) * (H / rect.height);
-      // set bunny velocity directly: teleport small step
       const dx = cx - bunny.x; const dy = cy - bunny.y; const dist = Math.hypot(dx,dy);
       if(dist>4){ const step = Math.min(dist, 24); bunny.x += dx/dist * step; bunny.y += dy/dist * step; }
     }
 
-    // modal and confetti
     const overlay = document.getElementById('overlay');
     const modal = document.getElementById('modal');
     const playAgainBtn = document.getElementById('playAgain');
@@ -237,30 +201,25 @@ Feel free to ask for: different colors, bunny sprite, sound effects, or sharing 
 
     function showModal(){
       overlay.style.display = 'flex'; overlay.style.pointerEvents='auto';
-      // random cute message - customise here
       const msgs = [
-        "The bunny's tummy is full — just like my heart for you.",
-        "Three sunflowers gone! The bunny says: you're the best!",
+        "I love you, Kiel. You make my heart hop.",
+        "The bunny's tummy is full — love you lots!"
       ];
       document.getElementById('cuteMsg').textContent = msgs[Math.floor(Math.random()*msgs.length)];
       spawnConfetti();
     }
     function hideModal(){ overlay.style.display='none'; overlay.style.pointerEvents='none'; removeConfetti(); }
 
-    // confetti
     const confettiContainer = document.createElement('div'); confettiContainer.style.position='absolute'; confettiContainer.style.left=0; confettiContainer.style.top=0; confettiContainer.style.right=0; confettiContainer.style.bottom=0; confettiContainer.style.pointerEvents='none'; document.getElementById('gameWrap').appendChild(confettiContainer);
     let confettiPieces = [];
     function spawnConfetti(){ confettiPieces.length=0; for(let i=0;i<80;i++){ confettiPieces.push({x: Math.random()*W, y:-10-Math.random()*200, vx:(Math.random()-0.5)*120, vy:50+Math.random()*160, rot:Math.random()*360, size:6+Math.random()*8, color:['#ff6b6b','#ffd93d','#6be4b4','#8ab4ff'][Math.floor(Math.random()*4)], el:null}); }
-      // create DOM elements
       confettiContainer.innerHTML='';
       for(const c of confettiPieces){ const el = document.createElement('div'); el.className='confetti-piece'; el.style.background = c.color; el.style.width = c.size+'px'; el.style.height = (c.size+6)+'px'; el.style.left = c.x+'px'; el.style.top = c.y+'px'; el.style.transform = `rotate(${c.rot}deg)`; confettiContainer.appendChild(el); c.el = el; }
-      // animate confetti
       let t0 = performance.now(); function run(){ if(confettiPieces.length==0) return; const t = performance.now(); const dt = Math.min(0.033,(t-t0)/1000); t0=t; for(let i=confettiPieces.length-1;i>=0;i--){ const p=confettiPieces[i]; p.x += p.vx*dt; p.y += p.vy*dt; p.vy += 240*dt; p.rot += 220*dt; if(p.y > H+40){ p.el.remove(); confettiPieces.splice(i,1); continue } p.el.style.left = p.x + 'px'; p.el.style.top = p.y + 'px'; p.el.style.transform = `rotate(${p.rot}deg)`; } if(confettiPieces.length>0) requestAnimationFrame(run); }
       requestAnimationFrame(run);
     }
     function removeConfetti(){ confettiPieces.forEach(c=>{ if(c.el) c.el.remove(); }); confettiPieces.length=0; confettiContainer.innerHTML=''; }
 
-    // small responsive initial message
     window.addEventListener('load', ()=>{ resetGame(); requestAnimationFrame(loop); });
   </script>
 </body>
